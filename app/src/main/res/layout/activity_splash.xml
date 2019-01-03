@@ -8,12 +8,12 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="match_parent"
+        android:layout_width="369dp"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/banners"
+        android:src="@drawable/imgs"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp" />
+        tools:layout_editor_absoluteY="52dp" />
 
     <ProgressBar
         android:id="@+id/progressBar2"

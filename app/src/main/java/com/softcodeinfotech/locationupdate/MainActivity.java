@@ -16,8 +16,18 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+//............
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -40,7 +50,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, OnMapReadyCallback {
     TextView longi, lati, dateTime, imei;
     private GoogleApiClient googleApiClient;
     private FusedLocationProviderApi locationProviderApi = LocationServices.FusedLocationApi;
@@ -68,6 +78,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private String employee_email;
     private String employee_password;
 
+    //google map
+    private GoogleMap mMap;
+    private static final LatLng SOFTCODE = new LatLng(28.618715, 77.030108);
+
+    private ProgressBar pBar;
 
     @SuppressLint("RestrictedApi")
     @Override
@@ -80,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         //  imei = findViewById(R.id.imei);
         attandance = findViewById(R.id.button2);
         exitTime = findViewById(R.id.button3);
+        pBar = findViewById(R.id.pBar);
+        pBar.setVisibility(View.GONE);
 
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
@@ -102,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         employee_id = SharePreferenceUtils.getInstance().getString(Constant.EMPLOYEE_id);
 
         employeeName.setText(employee_name);
-        employeeId.setText("SOFT00"+employee_id+"IN");
+        employeeId.setText("SOFT00" + employee_id + "IN");
 
         // Toast.makeText(this, ""+employee_id+" "+employee_name+" "+employee_id, Toast.LENGTH_SHORT).show();
 
@@ -124,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     SharePreferenceUtils.getInstance().saveString(Constant.EMPLOYEE_entrytime, "true");
                     attandance.setEnabled(false);
                     saveDataReq();
+                    pBar.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -137,6 +155,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     SharePreferenceUtils.getInstance().saveString(Constant.EMPLOYEE_exittime, "true");
                     exitTime.setEnabled(false);
                     saveDataReq();
+                    pBar.setVisibility(View.VISIBLE);
+                    SharePreferenceUtils.getInstance().deletePref();
 
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -146,17 +166,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                             System.exit(0);
                         }
                     }, 3000);
-                   /* try {
-                        wait(3000);
-                        MainActivity.this.finish();
-                        System.exit(0);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }*/
+
                 }
 
             }
         });
+
 
     }
 
@@ -192,6 +207,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         lati.setText(String.valueOf(myLati));
         longi.setText(String.valueOf(myLongi));
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         //SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         //String currentDateandTime = sdf.format(new Date());
@@ -271,7 +289,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onResponse(Call<LocationResponse> call, Response<LocationResponse> response) {
                 if (response.body().getStatus() == 1) {
-                    Toast.makeText(MainActivity.this, "" + myLati, Toast.LENGTH_SHORT).show();
+                    pBar.setVisibility(View.GONE);
+                    Toast.makeText(MainActivity.this, "Your Response Updated Sucessfully", Toast.LENGTH_SHORT).show();
 
 
                 }
@@ -292,5 +311,34 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         RequestBody plainString = RequestBody.create(MediaType.parse("text/plain"), data);
         return plainString;
     }
+
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        LatLng mylocation = new LatLng(myLati, myLongi);
+        mMap = map;
+        mMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.e_location))
+                .anchor(0.0f, 1.0f)
+                .title("You" + "(" + employee_name + ")")
+                .position(mylocation));
+        mMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.office))
+                .anchor(0.0f, 1.0f)
+                .title("Softcode Infotech Pvt Ltd")
+                .position(SOFTCODE));
+
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(mylocation)
+                .zoom(14)
+                .bearing(360)
+                .tilt(5)
+                .build();
+
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+    }
+
 
 }

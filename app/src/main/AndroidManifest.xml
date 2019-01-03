@@ -6,7 +6,17 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
+    <!-- EXTERNAL_STORAGE permissions are optional for Android 6.0 onwards. -->
+   <!-- <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="22" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="22" />
+-->
     <application
         android:name=".MyApp"
         android:allowBackup="true"
@@ -16,6 +26,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBDmryeQhZojk9XTX51vSO18s_N8YC_Fvg"/>
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait" />
