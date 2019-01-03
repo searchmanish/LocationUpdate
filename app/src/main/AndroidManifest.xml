@@ -28,7 +28,7 @@
         android:usesCleartextTraffic="true">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBDmryeQhZojk9XTX51vSO18s_N8YC_Fvg"/>
+            android:value="XXXXXXXXXXXXXXXX"/>
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
